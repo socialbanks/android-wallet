@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">SocialBanks</string>
+
+    <string name="title_section1">Minhas Contas</string>
+    <string name="title_section2">Configurações</string>
+    <string name="title_section3">Logout</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
+
+    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_words_secrets">WordsSecretsActivity</string>
+
+    <string name="app_id">756739547780180</string>
+
+    <string name="label_welcome"><b>BEM VINDO</b></string>
+    <string name="label_welcome_sub"><b>A SUA CARTEIRA VIRTUAL</b></string>
+
+    <string name="label_rescue"><b>INSIRA SUAS\n12 PALAVRAS</b></string>
+    <string name="label_rescue_sub"><b>SEPARADAS POR ESPAÇO</b></string>
+
+    <string name="label_new_words"><b>GERANDO 12\nPALAVRAS...</b></string>
+    <string name="label_new_words_sub"><b>AGUARDE POR FAVOR</b></string>
+
+
+    <string name="label_primary_access"><b>OLÁ</b></string>
+    <string name="label_primary_access_sub"><b>É O SEU PRIMEIRO ACESSO?</b></string>
+
+
+    <string name="example_seed">yard impulse luxury drive today throw farm pepper survey wreck glass federal</string>
+
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_register">RegisterActivity</string>
+
+
+    <string name="verify_registrer_firstname_error">É necessario ter o primeiro nome</string>
+    <string name="verify_registrer_lastname_error">É necessario ter o segundo nome</string>
+    <string name="verify_registrer_email_error">É necessario ter o email</string>
+    <string name="verify_registrer_email_invalid_error">Email inválido!</string>
+    <string name="verify_registrer_username_error">É necessario ter o Username</string>
+    <string name="verify_registrer_password_error">É necessario ter o Senha</string>
+    <string name="verify_registrer_repeat_password_error">Repita a senha</string>
+    <string name="verify_registrer_diferent_password_error">Senhas não conferem</string>
+
+
+</resources>

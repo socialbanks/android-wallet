@@ -1,0 +1,57 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.bitcoin.socialbanks.fragments.ReceiveFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp"
+>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginBottom="15dp"
+            android:text="Descrição"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/receiver_description_et"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@drawable/background_rescue_words_edittext"
+            android:layout_gravity="center_horizontal"
+            android:ems="10"
+            android:padding="10dp"
+            android:gravity="start"
+            android:inputType="textMultiLine"
+            android:layout_weight="0.58" />
+
+        <Button
+            android:id="@+id/receiver_generate_qr_bt"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/background_button_cadastrar"
+            android:text="Gerar QRCode"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/image_qrcode"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</ScrollView>
