@@ -134,6 +134,7 @@ public class BanksAdapter extends ArrayAdapter<Wallet> {
             viewHolder.enviar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ApplicationConfig.getConfig().setBufferWallet(p.getParseObject());
                     ApplicationConfig.getConfig().getRootActivity().switchFragment(SendFragment.newInstance(p.getIdObject(), p.getSocialBank().getObjectId()));
 
                 }
@@ -141,13 +142,14 @@ public class BanksAdapter extends ArrayAdapter<Wallet> {
             viewHolder.receber.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ApplicationConfig.getConfig().getRootActivity().switchFragment(ReceiveFragment.newInstance(p.getBitcoinAdress()));
 
+                    ApplicationConfig.getConfig().getRootActivity().switchFragment(ReceiveFragment.newInstance(p.getBitcoinAdress()));
                 }
             });
             viewHolder.extrato.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ApplicationConfig.getConfig().setBufferWallet(p.getParseObject());
                     ApplicationConfig.getConfig().getRootActivity().switchFragment(BankDetailFragment.newInstance(p.getIdObject()));
 
                 }

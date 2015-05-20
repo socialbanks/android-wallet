@@ -2,52 +2,52 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/linearLayout3"
             android:layout_width="275dp"
             android:layout_height="wrap_content"
-            android:id="@+id/linearLayout3">
+            android:orientation="vertical"
+            android:layout_toLeftOf="@+id/item_list_transaction_balance_tv"
+            android:layout_toStartOf="@+id/item_list_transaction_balance_tv">
 
             <TextView
+                android:id="@+id/item_list_transaction_date_tv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:gravity="left"
                 android:text="20 de Janeiro de 2015"
-                android:gravity="left"
-                android:layout_weight="1"
-                android:id="@+id/item_list_transaction_date_tv" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
+                android:id="@+id/item_list_transaction_description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Tansferencia para Joao"
-                android:layout_weight="1"
+                android:ellipsize="end"
                 android:gravity="left"
-                android:id="@+id/item_list_transaction_description_tv" />
+                android:lines="1"
+                android:text="Tansferencia para Joao"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
 
         <TextView
-
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="R$ 50,00"
-            android:gravity="right"
             android:id="@+id/item_list_transaction_balance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:gravity="left"
+            android:text="R$ 50,00"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />

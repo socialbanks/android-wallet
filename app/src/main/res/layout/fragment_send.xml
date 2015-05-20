@@ -45,7 +45,6 @@
                 android:ems="10"
                 android:inputType="textEmailAddress"
                 android:padding="10dp" />
-
         </LinearLayout>
 
         <Button
@@ -62,7 +61,7 @@
             android:drawableLeft="@drawable/abc_ic_search_api_mtrl_alpha"
             android:gravity="center"
             android:padding="10dp"
-            android:text="   Buscar"
+            android:text="Search"
             android:textColor="#fff"
             android:textStyle="bold" />
 
@@ -81,9 +80,9 @@
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:layout_alignTop="@+id/send_fragment_listview"
+            android:layout_centerHorizontal="true" />
 
 
     </RelativeLayout>

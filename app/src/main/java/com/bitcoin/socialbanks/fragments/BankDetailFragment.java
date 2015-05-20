@@ -1,5 +1,7 @@
 package com.bitcoin.socialbanks.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bitcoin.socialbanks.Model.Transaction;
@@ -17,7 +21,9 @@ import com.bitcoin.socialbanks.adapters.TransactionsAdapter;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -42,13 +48,17 @@ public class BankDetailFragment extends Fragment {
 
     Button buyBt;
     Button receiverBt;
+    Button sendBt;
 
     ParseQuery<ParseObject> mainQueryLocal;
     ParseQuery<ParseObject> mainQuery;
     ParseQuery<ParseObject> query;
 
 
+    ProgressBar progressBar;
     ParseObject walletBuffer;
+
+    ImageView imageBank;
 
 
     private OnFragmentInteractionListener mListener;
@@ -83,6 +93,7 @@ public class BankDetailFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        progressBar.setVisibility(View.VISIBLE);
         ParseQuery queryReceiverLocal = ParseQuery.getQuery("Transaction");
         queryReceiverLocal.whereEqualTo("receiverWallet", walletBuffer);
 
@@ -162,6 +173,7 @@ public class BankDetailFragment extends Fragment {
                         });
                     }
 
+                    progressBar.setVisibility(View.GONE);
                     listTransaction.clear();
                     for (final ParseObject obj : results) {
 
@@ -170,15 +182,15 @@ public class BankDetailFragment extends Fragment {
 
                         ParseObject sender = obj.getParseObject("senderWallet");
 
-                        if(sender == null){
+                        if (sender == null) {
                             comment = obj.getString("senderDescription");
 
                         }
-                        if(walletBuffer == null)
+                        if (walletBuffer == null)
                             comment = obj.getString("senderDescription");
 
 
-                        if(sender != null && walletBuffer !=null) {
+                        if (sender != null && walletBuffer != null) {
                             if (sender.getObjectId().toString().equals(walletBuffer.getObjectId().toString())) {
                                 value *= -1;
                                 comment = obj.getString("senderDescription");
@@ -209,8 +221,13 @@ public class BankDetailFragment extends Fragment {
 
         buyBt = (Button) rootView.findViewById(R.id.bank_detail_buy);
         receiverBt = (Button) rootView.findViewById(R.id.bank_detail_receiver);
+        sendBt = (Button) rootView.findViewById(R.id.bank_detail_send);
 
-        ParseObject walletbuff = appConfig.getBufferWallet();
+        imageBank = (ImageView) rootView.findViewById(R.id.bank_detail_image);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.fragment_bank_detail_progressbar);
+
+        final ParseObject walletbuff = appConfig.getBufferWallet();
 
         wallet = new Wallet(walletbuff);
 
@@ -219,6 +236,14 @@ public class BankDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ApplicationConfig.getConfig().getRootActivity().switchFragment(QrCodeScannerFragment.newInstance(wallet.getIdObject()));
+
+            }
+        });
+
+        sendBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApplicationConfig.getConfig().getRootActivity().switchFragment(SendFragment.newInstance(wallet.getIdObject(), wallet.getSocialBank().getObjectId()));
 
             }
         });
@@ -234,13 +259,31 @@ public class BankDetailFragment extends Fragment {
 
         Double valor = Double.valueOf(String.format(Locale.US, "%.2f", wallet.getBalance() / 100));
 
-        balanceTextView.setText("R$ " + valor);
+        balanceTextView.setText("" + valor);
 
         transactionListView = (ListView) rootView.findViewById(R.id.bank_detail_transactions_lv);
 
         transactionsAdapter = new TransactionsAdapter(getActivity(), R.layout.item_list_transaction, listTransaction);
         transactionListView.setAdapter(transactionsAdapter);
 
+
+        ParseFile file = wallet.getSocialBank().getParseFile("image");
+
+        if (file != null) {
+            file.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] bytes, ParseException e) {
+
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                    imageBank.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
+
+
+                    bitmap.recycle();
+                }
+            });
+
+        }
 
         return rootView;
     }
@@ -272,6 +315,7 @@ public class BankDetailFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+
     }
 
     @Override

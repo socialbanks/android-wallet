@@ -19,8 +19,16 @@ public class ApplicationConfig extends Application {
     private Fragment lastFragment;
     private Fragment atualFragment;
     private String bitcoinAddress;
+    private String wifRemore;
 
 
+    public void setWifRemore(String wifRemore) {
+        this.wifRemore = wifRemore;
+    }
+
+    public String getWifRemore() {
+        return wifRemore;
+    }
 
     @Override
     public void onCreate() {

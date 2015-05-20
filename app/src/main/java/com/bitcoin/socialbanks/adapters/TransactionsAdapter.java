@@ -67,7 +67,7 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction> {
 
         viewHolder.description.setText(p.getDescription());
 
-        Double valor = Double.valueOf(String.format(Locale.US, "%.2f",p.getValue()/100));
+        Double valor = Double.valueOf(String.format(Locale.US, "%.2f", p.getValue() / 100));
 
         viewHolder.balance.setText("R$ " + valor);
 
@@ -80,7 +80,11 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction> {
         int currentMonthcmp = cld.get(Calendar.MONTH);
         int currentYearcmp = cld.get(Calendar.YEAR);
 
-        String data = currentDaycmp + " de " + meses[currentMonthcmp - 1] + " de " + currentYearcmp;
+        int current_hour = cld.get(Calendar.HOUR_OF_DAY);
+        int current_minute = cld.get(Calendar.MINUTE);
+
+        String data = meses[currentMonthcmp - 1] + " " + currentDaycmp + ", " + currentYearcmp + "  " + current_hour + ":" + current_minute;
+
 
         if (viewHolder.date != null) {
             viewHolder.date.setText(data);

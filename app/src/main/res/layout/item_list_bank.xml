@@ -14,7 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         card_view:cardCornerRadius="4dp">
 
         <LinearLayout
@@ -22,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.44"
+            android:background="#fff"
             android:orientation="vertical"
             android:padding="10dp">
 
@@ -64,7 +67,7 @@
                         android:id="@+id/item_list_search_name_et"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="R$"
+                        android:text="$"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="@color/verde_mais_escuro"
                         android:textSize="40sp"
@@ -106,7 +109,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/container_control"
                     android:background="@color/verde_mais_claro"
-                    android:text="Pagar Conta"
+                    android:text="PAY NOW"
                     android:textColor="#fff"
                     android:textStyle="bold" />
 
@@ -131,7 +134,7 @@
                             android:layout_height="fill_parent"
                             android:background="@color/verde_mais_escuro"
                             android:descendantFocusability="blocksDescendants"
-                            android:text="Enviar"
+                            android:text="Send"
                             android:textColor="#fff"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -151,7 +154,7 @@
                             android:layout_height="fill_parent"
                             android:background="@color/verde_mais_escuro"
                             android:descendantFocusability="blocksDescendants"
-                            android:text="Receber"
+                            android:text="Receive"
                             android:textColor="#fff"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -170,7 +173,7 @@
                             android:layout_height="wrap_content"
                             android:background="@color/verde_mais_escuro"
                             android:descendantFocusability="blocksDescendants"
-                            android:text="Extrato"
+                            android:text="History"
                             android:textColor="#fff"
                             android:textStyle="bold" />
                     </LinearLayout>

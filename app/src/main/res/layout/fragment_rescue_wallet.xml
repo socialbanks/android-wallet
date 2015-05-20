@@ -73,7 +73,7 @@
             android:layout_gravity="center_horizontal"
             android:background="@drawable/background_button_cadastrar"
             android:elevation="10dp"
-            android:text="RESGATAR"
+            android:text="REDEEM"
             android:textColor="#fff"
             android:textStyle="bold" />
 

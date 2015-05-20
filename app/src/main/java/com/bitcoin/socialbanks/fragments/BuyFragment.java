@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitcoin.socialbanks.R;
-import com.bitcoin.socialbanks.application.ApplicationConfig;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -102,7 +103,7 @@ public class BuyFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception ex) {
-            Toast.makeText(getActivity(), "Valor inválido", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Invalid Value", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -123,7 +124,10 @@ public class BuyFragment extends Fragment {
         cancelBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ApplicationConfig.getConfig().getRootActivity().switchFragment(BanksFragment.newInstance("", ""));
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                fragmentTransaction.replace(R.id.container, BanksFragment.newInstance("", ""));
+                fragmentTransaction.commit();
             }
         });
         buyBt.setOnClickListener(new View.OnClickListener() {
@@ -132,7 +136,7 @@ public class BuyFragment extends Fragment {
 
 
                 dialog = new ProgressDialog(getActivity());
-                dialog.setMessage("Enviando Valor...");
+                dialog.setMessage("Sending Money...");
                 dialog.show();
                 dialog.setCancelable(false);
 
@@ -152,8 +156,11 @@ public class BuyFragment extends Fragment {
 
                         if (e == null) {
 
-                            ApplicationConfig.getConfig().getRootActivity().switchFragment(BanksFragment.newInstance("", ""));
-                            Toast.makeText(getActivity(), "Efetuado com sucesso!", Toast.LENGTH_LONG).show();
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                            fragmentTransaction.replace(R.id.container, BanksFragment.newInstance("", ""));
+                            fragmentTransaction.commit();
+                            Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -167,7 +174,7 @@ public class BuyFragment extends Fragment {
 
 
         dialog = new ProgressDialog(getActivity());
-        dialog.setMessage("Obtendo dados...");
+        dialog.setMessage("Getting...");
         dialog.show();
         dialog.setCancelable(false);
 

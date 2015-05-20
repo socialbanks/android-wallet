@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">SocialBanks</string>
 
-    <string name="title_section1">Minhas Contas</string>
-    <string name="title_section2">Configurações</string>
+    <string name="title_section1">My accounts</string>
+    <string name="title_section2">Settings</string>
     <string name="title_section3">Logout</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -20,18 +20,18 @@
 
     <string name="app_id">756739547780180</string>
 
-    <string name="label_welcome"><b>BEM VINDO</b></string>
-    <string name="label_welcome_sub"><b>A SUA CARTEIRA VIRTUAL</b></string>
+    <string name="label_welcome"><b>WELCOME</b></string>
+    <string name="label_welcome_sub"><b>TO YOUR VIRTUAL WALLET</b></string>
 
-    <string name="label_rescue"><b>INSIRA SUAS\n12 PALAVRAS</b></string>
-    <string name="label_rescue_sub"><b>SEPARADAS POR ESPAÇO</b></string>
+    <string name="label_rescue"><b>ENTER YOUR 12 WORDS</b></string>
+    <string name="label_rescue_sub"><b>SEPARATED BY SPACES</b></string>
 
-    <string name="label_new_words"><b>GERANDO 12\nPALAVRAS...</b></string>
-    <string name="label_new_words_sub"><b>AGUARDE POR FAVOR</b></string>
+    <string name="label_new_words"><b>GENERATING 12 WORDS...</b></string>
+    <string name="label_new_words_sub"><b>PLEASE WAIT</b></string>
 
 
-    <string name="label_primary_access"><b>OLÁ</b></string>
-    <string name="label_primary_access_sub"><b>É O SEU PRIMEIRO ACESSO?</b></string>
+    <string name="label_primary_access"><b>HELLO</b></string>
+    <string name="label_primary_access_sub"><b>THIS IS YOUR FIRST ACCESS?</b></string>
 
 
     <string name="example_seed">yard impulse luxury drive today throw farm pepper survey wreck glass federal</string>
@@ -42,14 +42,76 @@
     <string name="title_activity_register">RegisterActivity</string>
 
 
-    <string name="verify_registrer_firstname_error">É necessario ter o primeiro nome</string>
-    <string name="verify_registrer_lastname_error">É necessario ter o segundo nome</string>
-    <string name="verify_registrer_email_error">É necessario ter o email</string>
-    <string name="verify_registrer_email_invalid_error">Email inválido!</string>
-    <string name="verify_registrer_username_error">É necessario ter o Username</string>
-    <string name="verify_registrer_password_error">É necessario ter o Senha</string>
-    <string name="verify_registrer_repeat_password_error">Repita a senha</string>
-    <string name="verify_registrer_diferent_password_error">Senhas não conferem</string>
 
+
+
+
+    <!-- Login Activity-->
+
+    <string name="login_activity_empty_name">You must enter your username</string>
+    <string name="login_activity_empty_password">You must enter your password</string>
+    <string name="login_activity_dialog_login">Logging...</string>
+    <string name="login_activity_title_not_login">Warning!</string>
+    <string name="login_activity_message_not_login">Login failed</string>
+    <string name="login_activity_welcome">WELCOME</string>
+    <string name="login_activity_welcome_sub">TO YOUR VIRTUAL WALLET</string>
+    <string name="login_activity_hint_user">User</string>
+    <string name="login_activity_hint_password">Password</string>
+    <string name="login_activity_button_login">Log in</string>
+    <string name="login_activity_not_user">Not Registered?</string>
+    <string name="login_activity_button_register">Register</string>
+    <string name="login_activity_button_fb_login">Log in with Facebook</string>
+
+
+    <!-- Register Activity -->
+
+    <string name="verify_registrer_firstname_error">You must enter your first name</string>
+    <string name="verify_registrer_lastname_error">You must enter your last name</string>
+    <string name="verify_registrer_email_error">CYou must enter your email</string>
+    <string name="verify_registrer_email_invalid_error">Email invalid!</string>
+    <string name="verify_registrer_username_error">You must enter your username</string>
+    <string name="verify_registrer_password_error">You must enter your password</string>
+    <string name="verify_registrer_repeat_password_error">Repeat your password</string>
+    <string name="verify_registrer_diferent_password_error">Passwords do not match</string>
+    <string name="activity_register_hint_firstname">Name</string>
+    <string name="activity_register_hint_lastname">Surname</string>
+    <string name="activity_register_hint_email">Email</string>
+    <string name="activity_register_hint_username">Username</string>
+    <string name="activity_register_hint_password">Password</string>
+    <string name="activity_register_hint_repeat_password">Repeat your password</string>
+    <string name="activity_register_button_register">REGISTER</string>
+
+    <!-- Root Activity -->
+
+    <string name="root_activity_logout_progress">Logging out...</string>
+
+    <!-- Fragment bank detail -->
+
+    <string name="fragment_bank_detail_button_buy">PAY</string>
+    <string name="fragment_bank_detail_button_receiver">RECEIVE</string>
+
+    <!-- Fragment buy -->
+
+    <string name="fragment_buy_value">Value</string>
+    <string name="fragment_buy_money_unit">$</string>
+    <string name="fragment_buy_description">Description</string>
+    <string name="fragment_buy_button_buy">PAY</string>
+    <string name="fragment_buy_button_cancel">CANCEL</string>
+
+    <!-- Fragment New Words -->
+
+    <string name="fragment_new_word_confirm_word">I understand</string>
+
+    <!--  Fragment Primary Access -->
+
+    <string name="fragment_primary_access_yes">YES, GENERATE 12 WORDS</string>
+    <string name="fragment_primary_access_no">NO, REDEEM EXISTING WALLET</string>
+
+    <!-- Fragment Receiver-->
+
+    <string name="fragment_receiver_get_QRCODE">GENERATE QRCode</string>
+
+
+    <string name="warning_words">Don\'t miss these words. Write them down on paper. If you lose the words, it will be impossible to recover your wallets.</string>
 
 </resources>

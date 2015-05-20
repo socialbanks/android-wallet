@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,12 +19,6 @@ import com.bitcoin.socialbanks.application.ApplicationConfig;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.google.common.collect.ImmutableList;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.encoder.QRCode;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -34,32 +27,12 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.DumpedPrivateKey;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutPoint;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.TransactionSignature;
-import org.bitcoinj.params.MainNetParams;
-import org.bitcoinj.script.Script;
-import org.bitcoinj.script.ScriptBuilder;
-import org.bitcoinj.store.UnreadableWalletException;
-import org.bitcoinj.wallet.DeterministicSeed;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -101,46 +74,25 @@ public class LoginActivity extends Activity {
         if (user != null) {
 
             SharedPreferences prefs = getSharedPreferences(getPackageName() + user.getEmail(), MODE_PRIVATE);
-            final String restoredWords = prefs.getString("seedWords", null);
-
+            final String restoredWords = prefs.getString("seedWords", "");
+            final  String addressBitcoin = prefs.getString("addressBitCoin","");
+            final String wifRemove = prefs.getString("wif_remove","");
 
             if (restoredWords == null) {
                 goToPrimaryAccess();
             } else {
-
-                final NetworkParameters params = MainNetParams.get();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DeterministicSeed seed = null;
-                        try {
-                            seed = new DeterministicSeed(restoredWords, null, "", 0);
-                        } catch (UnreadableWalletException e) {
-                            e.printStackTrace();
-                        }
-
-                        Wallet wallet = Wallet.fromSeed(params, seed);
-                        //Wallet.SendRequest.
-
-                        ChildNumber number = new ChildNumber(0, true);
-                        ArrayList<ChildNumber> list = new ArrayList<ChildNumber>();
-                        list.add(number);
-
-                        String bitcoinAddress = wallet.getKeyByPath(list).toAddress(params).toString();
-
-                        Log.v("Login","BitCoin words -> " + restoredWords);
-                        Log.v("Login","BitCoin address -> " + bitcoinAddress);
-                        ApplicationConfig.getConfig().setBitcoinAddress(bitcoinAddress);
-                    }
-                }).start();
-
+                if(!addressBitcoin.equals(""))
+                    ApplicationConfig.getConfig().setBitcoinAddress(addressBitcoin);
+                if(!wifRemove.equals(""))
+                    ApplicationConfig.getConfig().setWifRemore(wifRemove);
 
                 goToRootActivity();
+           //     Log.v("Login", "BitCoinJ words -> " + restoredWords);
+           //     Log.v("Login", "BitCoinJ address -> " + ApplicationConfig.getConfig().getBitcoinAddress());
             }
         }
 
-      //  rescueSeed();
+     //     rescueSeed();
 
     }
 
@@ -184,30 +136,20 @@ public class LoginActivity extends Activity {
             switch (v.getId()) {
                 case R.id.login_button:
 
-                    QRCodeWriter qrCodeWriter = new QRCodeWriter();
-
-                    try {
-                        BitMatrix byteMatrix = qrCodeWriter.encode("teste", BarcodeFormat.QR_CODE, 300, 300);
-
-                        QRCode code = new QRCode();
-                    } catch (WriterException e) {
-                        e.printStackTrace();
-                    }
-
                     String email = emailTv.getText().toString();
                     String password = passwordTv.getText().toString();
 
                     if (email == null || email.equals("")) {
-                        emailTv.setError("É necessario preencher o usuario");
+                        emailTv.setError(getString(R.string.login_activity_empty_name));
                         break;
                     }
 
                     if (password == null || password.equals("")) {
-                        passwordTv.setError("� necessario preencher a senha");
+                        passwordTv.setError(getString(R.string.login_activity_empty_password));
                         break;
                     }
 
-                    showDialog("", "Logando");
+                    showDialog("",getString(R.string.login_activity_dialog_login));
                     ParseUser.logInInBackground(email, password, new LogInCallback() {
                         @Override
                         public void done(ParseUser parseUser, ParseException e) {
@@ -219,8 +161,8 @@ public class LoginActivity extends Activity {
                                     diag.dismiss();
 
                                 AlertDialog.Builder adiag = new AlertDialog.Builder(LoginActivity.this);
-                                adiag.setTitle("Aviso!");
-                                adiag.setMessage("Nãjoaoo foi possivel logar");
+                                adiag.setTitle(getString(R.string.login_activity_title_not_login));
+                                adiag.setMessage(getString(R.string.login_activity_message_not_login));
                                 adiag.show();
                             }
                         }
@@ -232,8 +174,6 @@ public class LoginActivity extends Activity {
                 case R.id.login_witch_facebook_bt:
 
                     loginFacebook();
-                    showDialog("", "Logando");
-
                     break;
 
                 case R.id.login_new_register:
@@ -241,7 +181,6 @@ public class LoginActivity extends Activity {
 
                     Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                     startActivity(i);
-
 
                     break;
             }
@@ -259,14 +198,14 @@ public class LoginActivity extends Activity {
             public void done(final ParseUser user, ParseException err) {
 
                 if (user == null) {
-                    Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+           //         Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
 
                     Toast.makeText(getApplicationContext(), "Log-out from Facebook and try again please!", Toast.LENGTH_SHORT).show();
 
                     ParseUser.logOut();
 
                 } else if (user.isNew()) {
-                    Log.d("MyApp", "User signed up and logged in through Facebook!");
+           //         Log.d("MyApp", "User signed up and logged in through Facebook!");
 
 
                     GraphRequest request = GraphRequest.newMeRequest(
@@ -294,12 +233,12 @@ public class LoginActivity extends Activity {
                                 }
                             });
                     Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id,name,email,gender, birthday");
+                    parameters.putString("fields", "name,email");
                     request.setParameters(parameters);
                     request.executeAsync();
 
                 } else {
-                    Log.d("MyApp", "User logged in through Facebook!");
+             //       Log.d("MyApp", "User logged in through Facebook!");
 
                     goToPrimaryAccess();
 
@@ -347,7 +286,7 @@ public class LoginActivity extends Activity {
             }
         });
     }
-
+/*
     public void rescueSeed() {
         final NetworkParameters params = MainNetParams.get();
 
@@ -659,7 +598,7 @@ public class LoginActivity extends Activity {
 
         Log.v("", "Wallet fee ->" + send.fee.longValue());
 */
-    }
+    //}*/
 
     public String openFileToString(byte[] _bytes) {
         String file_string = "";

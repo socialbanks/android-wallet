@@ -70,7 +70,7 @@
             android:background="@drawable/background_button_cadastrar"
             android:elevation="10dp"
             android:layout_marginBottom="20dp"
-            android:text="SIM, GERAR 12 DÍGITOS"
+            android:text="@string/fragment_primary_access_yes"
             android:textColor="#fff"
             android:textStyle="bold" />
 
@@ -81,7 +81,7 @@
             android:layout_gravity="center_horizontal"
             android:background="@drawable/background_button_entrar"
             android:elevation="10dp"
-            android:text="NÃO, RESGATAR CARTEIRA EXISTENTE"
+            android:text="@string/fragment_primary_access_no"
             android:textColor="#fff"
             android:textStyle="bold"
             android:layout_below="@+id/primary_access_yes_bt"

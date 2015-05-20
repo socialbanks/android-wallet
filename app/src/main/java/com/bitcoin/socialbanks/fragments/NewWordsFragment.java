@@ -1,9 +1,11 @@
 package com.bitcoin.socialbanks.fragments;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.spongycastle.util.encoders.Hex;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -36,6 +39,10 @@ public class NewWordsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    String wifRemove;
+
+    String bitcoinAddress;
 
     private OnFragmentInteractionListener mListener;
 
@@ -73,7 +80,7 @@ public class NewWordsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-      //  rescueSeed();
+        //  rescueSeed();
     }
 
     @Override
@@ -82,7 +89,6 @@ public class NewWordsFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_new_words, container, false);
-        final NetworkParameters params = MainNetParams.get();
 
 
         seedTv = (TextView) rootView.findViewById(R.id.new_word_seed_tv);
@@ -90,56 +96,24 @@ public class NewWordsFragment extends Fragment {
 
         final ParseUser user = ParseUser.getCurrentUser();
 
-        SecureRandom random = new SecureRandom();
-        DeterministicSeed seed2 = new DeterministicSeed(random,128,"",0);
 
-        List<String> mnemonic = seed2.getMnemonicCode();
-        String mnemonicConcat = "";
-
-        for (String item : mnemonic){
-            mnemonicConcat = mnemonicConcat + " " + item;
-        }
-
-        seedTv.setText(mnemonicConcat);
-
-        final String finalMnemonicConcat = mnemonicConcat;
-
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DeterministicSeed seed = null;
-                try {
-                    seed = new DeterministicSeed(finalMnemonicConcat, null, "", 0);
-                } catch (UnreadableWalletException e) {
-                    e.printStackTrace();
-                }
-
-                Wallet wallet = Wallet.fromSeed(params, seed);
-                //Wallet.SendRequest.
-
-                ChildNumber number = new ChildNumber(0, true);
-                ArrayList<ChildNumber> list = new ArrayList<ChildNumber>();
-                list.add(number);
-
-                String bitcoinAddress = wallet.getKeyByPath(list).toAddress(params).toString();
-
-                ApplicationConfig.getConfig().setBitcoinAddress(bitcoinAddress);
-            }
-        }).start();
-
+    //    Log.v("Login", "BitCoinJ words -> " + finalMnemonicConcat);
+    //    Log.v("Login", "BitCoinJ address -> " + ApplicationConfig.getConfig().getBitcoinAddress());
 
         saveSeedBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences(getActivity().getPackageName() + user.getEmail(), getActivity().MODE_PRIVATE).edit();
 
-                if (!seedTv.getText().toString().equals(""))
+                if (!seedTv.getText().toString().equals("")) {
                     editor.putString("seedWords", seedTv.getText().toString());
+                    editor.putString("addressBitCoin", bitcoinAddress);
+                    editor.putString("wif_remove",wifRemove);
+                }
                 editor.commit();
 
-
                 Intent i = new Intent(getActivity(), RootActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);
 
             }
@@ -154,6 +128,16 @@ public class NewWordsFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        BitcoionAddress btAddrss = new BitcoionAddress();
+        btAddrss.execute();
     }
 
     @Override
@@ -182,10 +166,81 @@ public class NewWordsFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
+
         }
     };
 
+    String mnemonicConcat = "";
+    public class BitcoionAddress extends AsyncTask<Integer, Integer, Void> {
 
+
+
+        public BitcoionAddress() {
+        }
+
+ProgressDialog dialog;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dialog = new ProgressDialog(getActivity());
+            dialog.setMessage("Generate...");
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Integer... p) {
+
+            final NetworkParameters params = MainNetParams.get();
+
+            SecureRandom random = new SecureRandom();
+            DeterministicSeed seed2 = new DeterministicSeed(random, 128, "", 0);
+
+            List<String> mnemonic = seed2.getMnemonicCode();
+
+
+            for (String item : mnemonic) {
+                mnemonicConcat = mnemonicConcat + " " + item;
+            }
+
+            final String finalMnemonicConcat = mnemonicConcat;
+
+
+            DeterministicSeed seed = null;
+            try {
+                seed = new DeterministicSeed(finalMnemonicConcat, null, "", 0);
+            } catch (UnreadableWalletException e) {
+                e.printStackTrace();
+            }
+
+            Wallet wallet = Wallet.fromSeed(params, seed);
+            //Wallet.SendRequest.
+
+            ChildNumber number = new ChildNumber(0, true);
+            ArrayList<ChildNumber> list = new ArrayList<ChildNumber>();
+            list.add(number);
+
+            bitcoinAddress = wallet.getKeyByPath(list).toAddress(params).toString();
+
+            wifRemove = Hex.toHexString(wallet.getKeyByPath(list).getPrivKeyBytes());
+
+            ApplicationConfig.getConfig().setBitcoinAddress(bitcoinAddress);
+            ApplicationConfig.getConfig().setWifRemore(wifRemove);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if(dialog != null)
+                dialog.dismiss();
+
+            seedTv.setText(mnemonicConcat);
+
+
+        }
+    }
   /*
 */
 }

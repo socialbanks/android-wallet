@@ -1,8 +1,6 @@
 package com.bitcoin.socialbanks.activities;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,21 +8,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bitcoin.socialbanks.R;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
 import com.bitcoin.socialbanks.fragments.BanksFragment;
-import com.parse.FunctionCallback;
 import com.parse.LogOutCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class RootActivity extends ActionBarActivity {
@@ -41,6 +33,9 @@ public class RootActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_root_nodrawer);
+
+        ActionBar bar = getSupportActionBar();
+        bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_toolbar));
 
         user = ParseUser.getCurrentUser();
 
@@ -59,37 +54,6 @@ public class RootActivity extends ActionBarActivity {
 
         final ParseUser user = ParseUser.getCurrentUser();
 
-        boolean fbNewUser = true;
-
-        if (fbNewUser) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            builder.setMessage("Para logar com email e senha, � necess�rio definir uma senha")
-                    .setPositiveButton("Cadastrar", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                        }
-                    })
-                    .setNegativeButton("Agora n�o", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                        }
-                    });
-
-            builder.show();
-        }
-
-
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        params.put("address", "1FTuKcjGUrMWatFyt8i1RbmRzkY2V9TDMG");
-
-        ParseCloud.callFunctionInBackground("get_balances", params, new FunctionCallback<Map<String, Object>>() {
-            public void done(Map<String, Object> mapObject, ParseException e) {
-
-                Log.v("cloud", "parsecloud");
-
-            }
-        });
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -172,11 +136,13 @@ public class RootActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(RootActivity.this,RegisterActivity.class);
+            startActivity(i);
             return true;
         }
         if (id == R.id.action_logout) {
             final ProgressDialog diag = new ProgressDialog(RootActivity.this);
-            diag.setMessage("Saindo...");
+            diag.setMessage(getString(R.string.root_activity_logout_progress));
             diag.show();
             ParseUser.logOutInBackground(new LogOutCallback() {
                 @Override
