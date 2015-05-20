@@ -13,13 +13,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bitcoin.socialbanks.Model.Transaction;
 import com.bitcoin.socialbanks.Model.Wallet;
 import com.bitcoin.socialbanks.R;
 import com.bitcoin.socialbanks.adapters.TransactionsAdapter;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -83,7 +83,6 @@ public class BankDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         appConfig = ApplicationConfig.getConfig();
-
         walletBuffer = appConfig.getBufferWallet();
 
 
@@ -94,7 +93,7 @@ public class BankDetailFragment extends Fragment {
         super.onResume();
 
         progressBar.setVisibility(View.VISIBLE);
-        ParseQuery queryReceiverLocal = ParseQuery.getQuery("Transaction");
+   /*     ParseQuery queryReceiverLocal = ParseQuery.getQuery("Transaction");
         queryReceiverLocal.whereEqualTo("receiverWallet", walletBuffer);
 
         ParseQuery querySenderLocal = ParseQuery.getQuery("Transaction");
@@ -103,7 +102,7 @@ public class BankDetailFragment extends Fragment {
         List<ParseQuery<ParseObject>> queriesLocal = new ArrayList<ParseQuery<ParseObject>>();
         queriesLocal.add(querySenderLocal);
         queriesLocal.add(queryReceiverLocal);
-/*
+
         mainQueryLocal = ParseQuery.or(queriesLocal);
         mainQueryLocal.fromLocalDatastore();
         mainQueryLocal.include("receiverWallet");
@@ -144,10 +143,10 @@ public class BankDetailFragment extends Fragment {
         });
 */
         ParseQuery queryReceiver = ParseQuery.getQuery("Transaction");
-        queryReceiver.whereEqualTo("receiverWallet", walletBuffer);
+        queryReceiver.whereEqualTo("receiverWallet", ParseObject.createWithoutData("Wallet", walletBuffer.getObjectId()));
 
         ParseQuery querySender = ParseQuery.getQuery("Transaction");
-        querySender.whereEqualTo("senderWallet", walletBuffer);
+        querySender.whereEqualTo("senderWallet", ParseObject.createWithoutData("Wallet", walletBuffer.getObjectId()));
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
 
@@ -162,17 +161,6 @@ public class BankDetailFragment extends Fragment {
             public void done(final List<ParseObject> results, ParseException e) {
                 if (e == null) {
 
-
-                    if (resultsLocal != null && resultsLocal.size() > 0) {
-
-                        ParseObject.unpinAllInBackground(resultsLocal, new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                ParseObject.pinAllInBackground(results);
-                            }
-                        });
-                    }
-
                     progressBar.setVisibility(View.GONE);
                     listTransaction.clear();
                     for (final ParseObject obj : results) {
@@ -181,29 +169,30 @@ public class BankDetailFragment extends Fragment {
                         String comment = "";
 
                         ParseObject sender = obj.getParseObject("senderWallet");
+                        ParseObject receiver = obj.getParseObject("receiverWallet");
 
                         if (sender == null) {
+                            comment = obj.getString("receiverDescription");
+
+                        } else if (receiver == null) {
                             comment = obj.getString("senderDescription");
+                            value *= -1;
 
-                        }
-                        if (walletBuffer == null)
+                        }else if (sender.getObjectId().toString().equals(walletBuffer.getObjectId().toString())) {
+                            value *= -1;
                             comment = obj.getString("senderDescription");
-
-
-                        if (sender != null && walletBuffer != null) {
-                            if (sender.getObjectId().toString().equals(walletBuffer.getObjectId().toString())) {
-                                value *= -1;
-                                comment = obj.getString("senderDescription");
-                            } else {
-                                comment = obj.getString("receiverDescription");
-                            }
-
-                            Date data = obj.getCreatedAt();
-                            Transaction tr = new Transaction(data, value, comment);
-                            listTransaction.add(tr);
+                        } else {
+                            comment = obj.getString("receiverDescription");
                         }
+
+                        Date data = obj.getCreatedAt();
+                        Transaction tr = new Transaction(data, value, comment);
+                        listTransaction.add(tr);
                     }
                     transactionsAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });

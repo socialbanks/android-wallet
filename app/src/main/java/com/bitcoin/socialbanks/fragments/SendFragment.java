@@ -141,7 +141,6 @@ public class SendFragment extends Fragment {
                     if (e == null) {
 
                         usersList.clear();
-                        Toast.makeText(getActivity(), "size " + list.size(), Toast.LENGTH_LONG).show();
 
                         for (ParseObject obj : list) {
                             ParseObject user = obj.getParseObject("user");

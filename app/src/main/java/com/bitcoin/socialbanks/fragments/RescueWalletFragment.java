@@ -124,7 +124,7 @@ public class RescueWalletFragment extends Fragment {
             //String teste = "virus decorate ahead sail hint buyer hollow smoke joke amused alert easy";
             DeterministicSeed seed = null;
             try {
-                seed = new DeterministicSeed(seedWordsEt.getText().toString(), null, "", 0);
+                seed = new DeterministicSeed(words, null, "", 0);
             } catch (UnreadableWalletException e) {
                 e.printStackTrace();
             }

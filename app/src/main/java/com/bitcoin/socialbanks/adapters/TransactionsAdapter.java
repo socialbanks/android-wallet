@@ -83,7 +83,7 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction> {
         int current_hour = cld.get(Calendar.HOUR_OF_DAY);
         int current_minute = cld.get(Calendar.MINUTE);
 
-        String data = meses[currentMonthcmp - 1] + " " + currentDaycmp + ", " + currentYearcmp + "  " + current_hour + ":" + current_minute;
+        String data = meses[currentMonthcmp] + " " + currentDaycmp + ", " + currentYearcmp + "  " + current_hour + ":" + current_minute;
 
 
         if (viewHolder.date != null) {
