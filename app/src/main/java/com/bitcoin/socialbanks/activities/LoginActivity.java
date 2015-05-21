@@ -78,7 +78,7 @@ public class LoginActivity extends Activity {
             final  String addressBitcoin = prefs.getString("addressBitCoin","");
             final String wifRemove = prefs.getString("wif_remove","");
 
-            if (restoredWords == null) {
+            if (restoredWords.equals("")) {
                 goToPrimaryAccess();
             } else {
                 if(!addressBitcoin.equals(""))

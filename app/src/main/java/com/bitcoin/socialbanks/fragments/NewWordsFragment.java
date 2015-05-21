@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.bitcoin.socialbanks.R;
 import com.bitcoin.socialbanks.activities.RootActivity;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
+import com.bitcoin.socialbanks.bitcoin.BitCoinUtils;
 import com.parse.ParseUser;
 
 import org.bitcoinj.core.NetworkParameters;
@@ -97,8 +98,8 @@ public class NewWordsFragment extends Fragment {
         final ParseUser user = ParseUser.getCurrentUser();
 
 
-    //    Log.v("Login", "BitCoinJ words -> " + finalMnemonicConcat);
-    //    Log.v("Login", "BitCoinJ address -> " + ApplicationConfig.getConfig().getBitcoinAddress());
+        //    Log.v("Login", "BitCoinJ words -> " + finalMnemonicConcat);
+        //    Log.v("Login", "BitCoinJ address -> " + ApplicationConfig.getConfig().getBitcoinAddress());
 
         saveSeedBt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +109,7 @@ public class NewWordsFragment extends Fragment {
                 if (!seedTv.getText().toString().equals("")) {
                     editor.putString("seedWords", seedTv.getText().toString());
                     editor.putString("addressBitCoin", bitcoinAddress);
-                    editor.putString("wif_remove",wifRemove);
+                    editor.putString("wif_remove", wifRemove);
                 }
                 editor.commit();
 
@@ -171,14 +172,15 @@ public class NewWordsFragment extends Fragment {
     };
 
     String mnemonicConcat = "";
-    public class BitcoionAddress extends AsyncTask<Integer, Integer, Void> {
 
+    public class BitcoionAddress extends AsyncTask<Integer, Integer, Void> {
 
 
         public BitcoionAddress() {
         }
 
-ProgressDialog dialog;
+        ProgressDialog dialog;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -222,7 +224,9 @@ ProgressDialog dialog;
 
             bitcoinAddress = wallet.getKeyByPath(list).toAddress(params).toString();
 
-            wifRemove = Hex.toHexString(wallet.getKeyByPath(list).getPrivKeyBytes());
+            String privKey = Hex.toHexString(wallet.getKeyByPath(list).getPrivKeyBytes());
+
+            wifRemove = BitCoinUtils.generatePrivKeyWIFFromPrivateKeyHex(privKey);
 
             ApplicationConfig.getConfig().setBitcoinAddress(bitcoinAddress);
             ApplicationConfig.getConfig().setWifRemore(wifRemove);
@@ -233,7 +237,7 @@ ProgressDialog dialog;
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if(dialog != null)
+            if (dialog != null)
                 dialog.dismiss();
 
             seedTv.setText(mnemonicConcat);

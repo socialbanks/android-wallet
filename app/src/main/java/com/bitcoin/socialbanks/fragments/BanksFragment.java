@@ -9,6 +9,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bitcoin.socialbanks.Model.Wallet;
 import com.bitcoin.socialbanks.R;
@@ -71,14 +72,16 @@ public class BanksFragment extends Fragment implements AbsListView.OnItemClickLi
         queryLocal = new ParseQuery("Wallet");
         queryLocal.fromLocalDatastore();
         queryLocal.include("socialBank");
-        queryLocal.whereEqualTo("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
-        queryLocal.whereEqualTo("bitcoinAddress",bitcoinAddress);
+        queryLocal.whereEqualTo("user", ParseObject.createWithoutData("User", ParseUser.getCurrentUser().getObjectId()));
+//        queryLocal.whereEqualTo("bitcoinAddress",bitcoinAddress);
         queryLocal.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
 
                 listLocalObjects = list;
                 if (e == null) {
+
+                    Toast.makeText(getActivity(), "local -> " + list.size(), Toast.LENGTH_LONG).show();
                     ParseObject socialB = new ParseObject("SocialBank");
 
                     listWallets.clear();
@@ -97,10 +100,11 @@ public class BanksFragment extends Fragment implements AbsListView.OnItemClickLi
                     }
                     mAdapter.notifyDataSetChanged();
 
+                }else{
+                    Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
-
 
 
     }
@@ -178,12 +182,13 @@ public class BanksFragment extends Fragment implements AbsListView.OnItemClickLi
         queryCloud = new ParseQuery("Wallet");
         queryCloud.include("socialBank");
         queryCloud.whereEqualTo("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
-        queryCloud.whereEqualTo("bitcoinAddress",bitcoinAddress);
+        //  queryCloud.whereEqualTo("bitcoinAddress",bitcoinAddress);
         queryCloud.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(final List<ParseObject> list, ParseException e) {
 
                 if (e == null) {
+                    Toast.makeText(getActivity(), "cloud -> " + list.size(), Toast.LENGTH_LONG).show();
 
                     ParseObject socialB;
 

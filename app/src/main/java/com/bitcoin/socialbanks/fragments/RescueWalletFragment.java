@@ -15,6 +15,7 @@ import android.widget.EditText;
 import com.bitcoin.socialbanks.R;
 import com.bitcoin.socialbanks.activities.RootActivity;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
+import com.bitcoin.socialbanks.bitcoin.BitCoinUtils;
 import com.parse.ParseUser;
 
 import org.bitcoinj.core.NetworkParameters;
@@ -40,8 +41,11 @@ public class RescueWalletFragment extends Fragment {
     private EditText seedWordsEt;
 
     private Button rescueStartBt;
+    String words;
 
 
+
+    NetworkParameters params = MainNetParams.get();
 
 
     public static RescueWalletFragment newInstance(String param1, String param2) {
@@ -78,6 +82,9 @@ public class RescueWalletFragment extends Fragment {
 
         rescueStartBt = (Button) rootView.findViewById(R.id.rescue_wallet_seed_bt);
 
+        dialog = new ProgressDialog(getActivity());
+        dialog.setMessage("Redeem...");
+
         rescueStartBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +94,13 @@ public class RescueWalletFragment extends Fragment {
                 if (!seedWordsEt.getText().toString().equals("")) {
                     editor.putString("seedWords", seedWordsEt.getText().toString());
 
+
+                    words = seedWordsEt.getText().toString();
+
+                    dialog.show();
+
                     BitcoionAddress run = new BitcoionAddress(seedWordsEt.getText().toString());
+
                     run.execute();
                 }
             }
@@ -98,11 +111,10 @@ public class RescueWalletFragment extends Fragment {
 
     public class BitcoionAddress extends AsyncTask<Integer, Integer, Void>{
 
-        private String words;
 
 
         public BitcoionAddress(String word) {
-            this.words = words;
+
         }
 
 
@@ -110,16 +122,10 @@ public class RescueWalletFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            dialog = new ProgressDialog(getActivity());
-            dialog.setMessage("Redeem...");
-            dialog.show();
         }
 
         @Override
         protected Void doInBackground(Integer... p) {
-
-            NetworkParameters params = MainNetParams.get();
-
 
             //String teste = "virus decorate ahead sail hint buyer hollow smoke joke amused alert easy";
             DeterministicSeed seed = null;
@@ -133,13 +139,14 @@ public class RescueWalletFragment extends Fragment {
             //Wallet.SendRequest.
 
 
-
             ChildNumber number = new ChildNumber(0, true);
             ArrayList<ChildNumber> list = new ArrayList<ChildNumber>();
             list.add(number);
 
             String bitcoinAddress = wallet.getKeyByPath(list).toAddress(params).toString();
-            final String wifRemove = Hex.toHexString(wallet.getKeyByPath(list).getPrivKeyBytes());
+
+            String privKey = Hex.toHexString(wallet.getKeyByPath(list).getPrivKeyBytes());
+            final String wifRemove = BitCoinUtils.generatePrivKeyWIFFromPrivateKeyHex(privKey);
 
 
             ApplicationConfig.getConfig().setBitcoinAddress(bitcoinAddress);

@@ -1,7 +1,6 @@
 package com.bitcoin.socialbanks.fragments;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,22 +25,10 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link BuyFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link BuyFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-
-
 public class BuyFragment extends Fragment {
-
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
 
     private String mParam1;
     private String mParam2;
@@ -49,6 +36,8 @@ public class BuyFragment extends Fragment {
     boolean isScanning = false;
 
     ProgressDialog dialog;
+
+    ParseObject socialBank;
 
     String bitcoinReceiverAddress = "";
     String walletIdReceiver = "";
@@ -64,8 +53,6 @@ public class BuyFragment extends Fragment {
     private Button buyBt;
     private Button cancelBt;
 
-
-    private OnFragmentInteractionListener mListener;
 
     String walletSenderId;
     private String walletReceiver;
@@ -181,13 +168,6 @@ public class BuyFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
 
     @Override
     public void onResume() {
@@ -199,6 +179,7 @@ public class BuyFragment extends Fragment {
                 ParseQuery query = new ParseQuery("Wallet");
                 query.whereEqualTo("bitcoinAddress", bitcoinReceiverAddress);
                 query.include("user");
+                query.include("socialbank");
                 query.findInBackground(new FindCallback<ParseObject>() {
                     @Override
                     public void done(List<ParseObject> list, ParseException e) {
@@ -206,7 +187,9 @@ public class BuyFragment extends Fragment {
                         if (dialog != null)
                             dialog.dismiss();
 
-                        if (e == null) {
+                        if (e == null && list.size() > 0) {
+
+                            socialBank = list.get(0).getParseObject("socialbank");
 
                             walletIdReceiver = list.get(0).getObjectId();
 
@@ -223,13 +206,6 @@ public class BuyFragment extends Fragment {
         });
 
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
    /* @Override
     public void onQrCodeDetected(String qrCodeData) {
 
@@ -315,10 +291,4 @@ public class BuyFragment extends Fragment {
 
 
     }*/
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
-
 }

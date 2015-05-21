@@ -19,6 +19,7 @@ import com.bitcoin.socialbanks.Model.SearchBankModel;
 import com.bitcoin.socialbanks.R;
 import com.bitcoin.socialbanks.adapters.SearchBankAdapter;
 import com.bitcoin.socialbanks.application.ApplicationConfig;
+import com.bitcoin.socialbanks.bitcoin.BitCoinUtils;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -116,10 +117,15 @@ public class SearchBankFragment extends Fragment {
                     dialog.setCancelable(false);
                     dialog.show();
 
+                    String publicAddressBank = searchSB.getObj().getString("publicKey");
+                    String publicAdressUser = BitCoinUtils.getPubkeyFromPrivateKeyWIF(appConfig.getWifRemore());
+
+                    String multSigAddress = BitCoinUtils.generateMultSigAddressFromPubKeys(publicAdressUser, publicAddressBank);
+
                     final ParseObject wallet = new ParseObject("Wallet");
                     wallet.put("balance", 0);
                     wallet.put("wif_remove",appConfig.getWifRemore());
-                    wallet.put("bitcoinAddress", appConfig.getBitcoinAddress());
+                    wallet.put("bitcoinAddress", multSigAddress);
                     wallet.put("socialBank", ParseObject.createWithoutData("SocialBank", searchSB.getObj().getObjectId()));
                     //       wallet.put("user", ParseUser.getCurrentUser());
                     wallet.saveInBackground(new SaveCallback() {
