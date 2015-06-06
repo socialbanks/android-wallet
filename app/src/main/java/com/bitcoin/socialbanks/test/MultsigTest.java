@@ -113,17 +113,16 @@ public class MultsigTest extends InstrumentationTestCase {
         Script outputScriptChange = ScriptBuilder.createOutputScript(addressChange);
         Script outputScript = ScriptBuilder.createOutputScript(receiverAddress);
 
-
         spendTx.addOutput(Coin.valueOf(1000), outputScriptChange);
         spendTx.addOutput(Coin.valueOf(100000), outputScript);
 
         //spendTx.addSignedInput(outPoint, scriptPublicKey, clientKey);
-        //Log.v("cloud code example", "Wallet multsig serialize: " + Hex.toHexString(spendTx.bitcoinSerialize()));
+        Log.v("cloud code example", "Wallet multsig serialize: " + Hex.toHexString(spendTx.bitcoinSerialize()));
 
-
+        String resultado = Hex.toHexString(spendTx.bitcoinSerialize());
 
         assertEquals("0100000001dd4117eab5a18cc1c1d3580822faf632f4bcec1fc079b935ef4ea1958b37cfb6000000009200483045022100a17271d87dc1ab36ebf9aa449cd1daae33aa4ad44b55f4a661b1a01e90b6411002200384b19d8246f8cdb8f5d7ac04a1e25730023dc912d57b1c9a8c70eb587787c8014752210213cc3e8aa13da9fdced6ac55737984b71a0ea6a9c1817cc15f687163813e44c82103d4e7ffa6ebedc601a5e9ca48b9d9110bef80c15ce45039a08a513801712579de52aeffffffff02e80300000000000017a914ff26223bbaa71dbaec1693059c1feb5d1e14b8f487a0860100000000001976a9149ea84056a5a9e294d93f11300be51d51868da69388ac00000000",
-                Hex.toHexString(spendTx.bitcoinSerialize()));
+                resultado);
     }
 
 
