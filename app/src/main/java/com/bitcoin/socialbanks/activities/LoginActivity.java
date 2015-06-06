@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bitcoin.socialbanks.R;
-import com.bitcoin.socialbanks.application.ApplicationConfig;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -52,6 +51,7 @@ import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.bitcoinj.wallet.Protos;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.spongycastle.util.encoders.Hex;
@@ -103,7 +103,7 @@ public class LoginActivity extends Activity {
             SharedPreferences prefs = getSharedPreferences(getPackageName() + user.getEmail(), MODE_PRIVATE);
             final String restoredWords = prefs.getString("seedWords", null);
 
-
+            /*
             if (restoredWords == null) {
                 goToPrimaryAccess();
             } else {
@@ -138,9 +138,9 @@ public class LoginActivity extends Activity {
 
                 goToRootActivity();
             }
+            */
         }
-
-      //  rescueSeed();
+        rescueSeed();
 
     }
 
@@ -391,51 +391,101 @@ public class LoginActivity extends Activity {
         ECKey serverKey = ECKey.fromPublicOnly(pkey.toByteArray());
 
 
+        //Ler https://bitcoin.org/en/developer-guide#multisig
+        ///////////////////
+        //Input
+        ///////////////////
+
+        ////
+
+        //Script redeemScript = ScriptBuilder.createRedeemScript(2, Arrays.asList(clientKey, serverKey));
+        Script redeemScript = ScriptBuilder.createMultiSigOutputScript(2, Arrays.asList(clientKey, serverKey));
+        Script scriptPublicKey = ScriptBuilder.createP2SHOutputScript(redeemScript);
+
+        Script scriptGambiarra = ScriptBuilder.createP2SHOutputScript(2, Arrays.asList(clientKey, serverKey));
+        Address addressChange = scriptGambiarra.getToAddress(params, true);
+
+        //scriptPublicKey = scriptGambiarra;
+
+        //Address addressChange = scriptPublicKey.getToAddress(params, true);
+
         Transaction spendTx = new Transaction(params);
-        Script multisigScript = ScriptBuilder.createP2SHOutputScript(2, Arrays.asList(clientKey, serverKey));
+        //Address addressChange = scriptPublicKey.getToAddress(params, true);
+
+        //???????
+        //Script inputScript2 = ScriptBuilder.createOutputScript(addressChange); //test
 
 
-        Sha256Hash sha256Hash = new Sha256Hash("0d2d6157088dc1c2efd826dbba2d647df2dcedaa3f0cd13834bc030d9552173d");
+        Sha256Hash sha256Hash = new Sha256Hash("87351f929547e8955e95aa074f9e06f7f92e14dd593de7781156327e34437127");
         TransactionOutPoint outPoint = new TransactionOutPoint(params, 0, sha256Hash);
 
-        TransactionInput input = new TransactionInput(params, null, multisigScript.getProgram(), outPoint);
+        TransactionInput input = new TransactionInput(params, null, scriptPublicKey.getProgram(), outPoint, Coin.valueOf(900000));
         spendTx.addInput(input);
 
-        Log.v("Transaction", "Transaction: " + Hex.toHexString(spendTx.bitcoinSerialize()));
+        //   Create p2sh multisig input script (client key only)
 
+        Sha256Hash sighash = spendTx.hashForSignature(0, redeemScript, Transaction.SigHash.ALL, false); //test
+        ECKey.ECDSASignature party1Signature = clientKey.sign(sighash);
+        TransactionSignature party1TransactionSignature = new TransactionSignature(party1Signature, Transaction.SigHash.ALL, false);
+
+        // Create p2sh multisig input script
+        Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(ImmutableList.of(party1TransactionSignature), redeemScript);
+
+
+        //Log.v("Transaction", "Wallet before sign:  " + Hex.toHexString(spendTx.bitcoinSerialize()));
+
+        //spendTx.getInputs().get(0).setScriptSig(inputScript);
+        input.setScriptSig(inputScript);
+
+        Log.v("Transaction", "Wallet signed Input: " + Hex.toHexString(spendTx.bitcoinSerialize()));
+
+
+
+        ///////////////////
         //output
+        ///////////////////
         Address address = null;
         try {
             address = new Address(params, "1FTuKcjGUrMWatFyt8i1RbmRzkY2V9TDMG");
         } catch (AddressFormatException e) {
             e.printStackTrace();
         }
+
+        Script outputScriptChange = ScriptBuilder.createOutputScript(addressChange);
         Script outputScript = ScriptBuilder.createOutputScript(address);
 
-        Log.v("cloud code example", "Wallet multsig address: " + multisigScript.getToAddress(params));
 
-        Address addressChange = multisigScript.getToAddress(params, true);
-        Script outputScriptChange = ScriptBuilder.createOutputScript(addressChange);
+        spendTx.addOutput(Coin.valueOf(750000), outputScriptChange);
+        spendTx.addOutput(Coin.valueOf(100000), outputScript);
 
-        spendTx.addOutput(Coin.valueOf(10000), outputScript);
-        spendTx.addOutput(Coin.valueOf(10000), outputScriptChange);
-
+        //spendTx.addSignedInput(outPoint, scriptPublicKey, clientKey);
         Log.v("cloud code example", "Wallet multsig serialize: " + Hex.toHexString(spendTx.bitcoinSerialize()));
 
 
-        Sha256Hash sighash = spendTx.hashForSignature(0, multisigScript, Transaction.SigHash.ALL, false);
 
-
+/*
         //   Create p2sh multisig input script (client key only)
         ECKey.ECDSASignature party1Signature = clientKey.sign(sighash);
         TransactionSignature party1TransactionSignature = new TransactionSignature(party1Signature, Transaction.SigHash.ALL, false);
-        Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(ImmutableList.of(party1TransactionSignature), multisigScript);
+        Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(ImmutableList.of(party1TransactionSignature), multisigOutputScript);
 
 
         input.setScriptSig(inputScript);
+*/
+        String txDotNet = "0100000001277143347e32561178e73d59dd142ef9f7069e4f07aa955e95e84795921f35870000000092000047304402207aa4875dfc80002e11350fe8dca6d4aed19fac943ab4db3a4347b8b7a383d62c022044f65ae5c54f250d08d7ed26f6ad0fc19acc08c82dff4517ebf50afb09904549014752210213cc3e8aa13da9fdced6ac55737984b71a0ea6a9c1817cc15f687163813e44c82103d4e7ffa6ebedc601a5e9ca48b9d9110bef80c15ce45039a08a513801712579de52aeffffffff02b0710b000000000017a914ff26223bbaa71dbaec1693059c1feb5d1e14b8f487a0860100000000001976a9149ea84056a5a9e294d93f11300be51d51868da69388ac00000000";
 
         Log.v("cloud code example", "Wallet multsig serialize: " + Hex.toHexString(spendTx.bitcoinSerialize()));
+        Log.v("cloud code example", "Wallet multsig expected:  " + txDotNet);
 
+        if (Hex.toHexString(spendTx.bitcoinSerialize()).equals(txDotNet)) {
+            Log.v("cloud code example", "Wallet RESULT: YESSSS!!!!");
+
+        } else {
+            Log.v("cloud code example", "Wallet RESULT: not yet" );
+
+        }
+
+        Log.v("test", "fim!");
 
         //  spendTx.addin
         //   TransactionOutput input = new TransactionOutput(params,null, Coin.CENT,inputScript.getProgram());
@@ -659,6 +709,133 @@ public class LoginActivity extends Activity {
 
         Log.v("", "Wallet fee ->" + send.fee.longValue());
 */
+
+
+        /* EXAMPLE .NET - NBitcoin
+
+﻿        //Create and sign an S2SH transaction (mapping a MultSig Script 2-of-2), transfering the bitcoins from the multisig address to the new address.
+        //IMPORTANTE: receiverAddress MUST be an ScriptAddress (P2SH)
+        //This method should receive a partial signed transaction instead of receiving the wifClient (WIF = Wallet Import Format).
+        //But for now, in this proof-of-concept, we're keeping the client's private key in the server until the proper P2SH partial signature be implemented in both iOS and Android.
+        public DtoSignedTransaction CreateAndSignP2SHTransaction(string wifServer, string password, string wifClient, string receiverAddress, long valueInSatoshis)
+        {
+            //Only the SocialBanks platform should know this privKey
+            Key privKeyServer;
+
+            if (password == "")
+                privKeyServer = Key.Parse(wifServer, Network.Main); //used in test cases
+            else
+                privKeyServer = Key.Parse(wifServer, password, Network.Main); //production keys are stored in the database encrypted with a password
+
+            //Calculate the SocialBank's pubKey and address
+            var pubKeyServer = privKeyServer.PubKey;
+
+            //////////////////////// this must be done at the client side to don't expose the clint's private key ////////////////////////////
+
+            var addressServer = pubKeyServer.GetAddress(Network.Main); // Ex: 14pkzzJbAg1N3EFkEnc4o5uHQJAzCqUUFJ
+
+            //Calculate the user's pubKey and address
+            var privKeyClient1 = Key.Parse(wifClient);
+            var pubKeyClient1 = privKeyClient1.PubKey;
+            var AddressClient1 = privKeyClient1.PubKey.GetAddress(Network.Main);
+
+            var receiverBtcAddress = new BitcoinScriptAddress(receiverAddress, Network.Main); //P2SH
+
+            Script client1P2SHScript =
+                PayToMultiSigTemplate.Instance.GenerateScriptPubKey(2, new[] { pubKeyServer, pubKeyClient1 });
+            var client1P2SHAddress = client1P2SHScript.GetScriptAddress(Network.Main); //Ex: 3Qx7v3AQshdKGCqu81QYtkQFDwHKDqaNBi
+
+            var apiHelper = new APIHelper();
+            var task = FindUnspentTransactionsByAddress(client1P2SHAddress.ToString());
+            task.Wait();
+            List<DtoUnspentTransaction> unspentTrans = task.Result;
+
+            var selectedUnspentTrans = new List<DtoUnspentTransaction>();
+            long addressBalanceInSatoshis = 0;
+            foreach (var trans in unspentTrans)
+            {
+                selectedUnspentTrans.Add(trans);
+
+                addressBalanceInSatoshis += trans.ValueInSatoshis;
+
+                if (addressBalanceInSatoshis >= (valueInSatoshis + DEFAULT_FEE))
+                    break;
+            }
+
+            //if balance isn't sufficient
+            if (addressBalanceInSatoshis < (valueInSatoshis + DEFAULT_FEE))
+            {
+                throw new Exception("Insufficient funds in " + client1P2SHAddress.ToString());
+            }
+
+            //var txHash = new uint256("967f947b7f995d7f45c4ce1f6eb42baf58376d8f9ba768322d2abe858f3bd272");
+            //var totalInBtc = "0.002";
+
+            Transaction client1P2SH = new Transaction();
+            bool feePayed = false;
+
+            foreach (var unspentOutput in selectedUnspentTrans)
+            {
+                long valueInSatoshisWithFee = unspentOutput.ValueInSatoshis;
+
+                if ((!feePayed) && (valueInSatoshisWithFee >= DEFAULT_FEE))
+                {
+                    valueInSatoshisWithFee = valueInSatoshisWithFee - DEFAULT_FEE;
+                    feePayed = true;
+                }
+
+
+                string valueInBtc = (valueInSatoshisWithFee / SATOSHIS_PER_BTC).ToString("0.00000000", CultureInfo.CreateSpecificCulture("en-US"));
+                valueInBtc = valueInBtc.Replace(',', '.');
+                IfVerboseWriteLine("unspentOutput.valueInSatoshisWithFee to string valueInBtc is: " + valueInBtc);
+
+                client1P2SH.Outputs.Add(new TxOut(valueInBtc, client1P2SHAddress));
+            }
+
+            //Coin array = new transaction input array
+            Coin[] client1CoinsP2SH = client1P2SH
+                .Outputs
+                .Select((outp, i) => new ScriptCoin(new OutPoint(selectedUnspentTrans[i].TxHash, selectedUnspentTrans[i].Index), outp, client1P2SHScript))
+                .ToArray();
+
+            var valueInBtcStr = (valueInSatoshis / SATOSHIS_PER_BTC).ToString("0.00000000", CultureInfo.CreateSpecificCulture("en-US"));
+            IfVerboseWriteLine("Total of inputs  to string valueInBtcStr is (before replace): " + valueInBtcStr);
+            valueInBtcStr = valueInBtcStr.Replace(',', '.');
+            IfVerboseWriteLine("Total of inputs  to string valueInBtcStr is (after replace): " + valueInBtcStr);
+
+            //////////////////////// END of "client" code ////////////////////////////
+
+            //create the transaction and sign with cient and server private keys (should be done in 2 phases)
+            var txBuilder = new TransactionBuilder();
+            var tx = txBuilder
+                    .AddCoins(client1CoinsP2SH)
+                    .AddKeys(privKeyClient1, privKeyServer)
+                    .AddKnownRedeems(client1P2SHScript)
+                    .Send(receiverBtcAddress, valueInBtcStr)
+                    .SetChange(client1P2SHAddress)
+                    .BuildTransaction(true); //true = sign!  If false, don't generate any "input script"
+
+            IfVerboseWriteLine("Transaction signed");
+
+            //serialize the transaction and prepare the result dto
+            var result = new DtoSignedTransaction()
+            {
+                RawTx = tx.ToHex(),
+                TxHash = tx.GetHash().ToString(),
+                TransferedValue = valueInSatoshis,
+                FeeValue = DEFAULT_FEE,
+                Success = true,
+                Message = ""
+            };
+
+            IfVerboseWriteLine("DtoSignedTransaction created");
+
+            return result;
+        }
+
+
+
+         */
     }
 
     public String openFileToString(byte[] _bytes) {
