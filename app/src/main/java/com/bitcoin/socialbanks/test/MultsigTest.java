@@ -19,6 +19,7 @@ import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
+import org.bitcoinj.signers.TransactionSigner;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -86,21 +87,52 @@ public class MultsigTest extends InstrumentationTestCase {
         Transaction spendTx = new Transaction(params);
 
         //prepare the input
-        Sha256Hash sha256Hash = new Sha256Hash("b6cf378b95a14eef35b979c01fecbcf432f6fa220858d3c1c18ca1b5ea1741dd");
-        TransactionOutPoint outPoint = new TransactionOutPoint(params, 0, sha256Hash);
+        Sha256Hash unspentTxHash = new Sha256Hash("b6cf378b95a14eef35b979c01fecbcf432f6fa220858d3c1c18ca1b5ea1741dd");
+        TransactionOutPoint outPoint = new TransactionOutPoint(params, 0, unspentTxHash);
+        TransactionInput inputTrans = new TransactionInput(params, null, redeemMultisigScript.getProgram(), outPoint, Coin.valueOf(101000));
+        spendTx.addInput(inputTrans);
 
-        // Create p2sh multisig input script and sign input
-        TransactionInput input = new TransactionInput(params, null, redeemMultisigScript.getProgram(), outPoint, Coin.valueOf(101000));
-        spendTx.addInput(input);
+        //TransactionInput inputTrans = spendTx.addInput(unspentTxHash, 0, redeemMultisigScript);
+
+
+
+        /*
+        //sign the input
+        int inputIndex = 0;
+        Script inputScript = inputTrans.getScriptSig();
+        byte[] script = redeemMultisigScript.getProgram();
+        TransactionSignature signature = spendTx.calculateSignature(inputIndex, clientKey, script, Transaction.SigHash.ALL, false);
+
+
+        // at this point we have incomplete inputScript with OP_0 in place of one or more signatures. We already
+        // have calculated the signature using the local key and now need to insert it in the correct place
+        // within inputScript. For pay-to-address and pay-to-key script there is only one signature and it always
+        // goes first in an inputScript (sigIndex = 0). In P2SH input scripts we need to figure out our relative
+        // position relative to other signers.  Since we don't have that information at this point, and since
+        // we always run first, we have to depend on the other signers rearranging the signatures as needed.
+        // Therefore, always place as first signature.
+        int sigIndex = 0;
+        //inputScript = inputScript.getScriptSigWithSignature(inputScript, signature.encodeToBitcoin(), sigIndex);
+        inputScript = inputTrans.getConnectedOutput().getScriptPubKey().getScriptSigWithSignature(inputScript, signature.encodeToBitcoin(), sigIndex);
+        inputTrans.setScriptSig(inputScript);
+        */
+
 
         Sha256Hash sighash = spendTx.hashForSignature(0, redeemMultisigScript, Transaction.SigHash.ALL, false); //test
         ECKey.ECDSASignature party1Signature = clientKey.sign(sighash);
         TransactionSignature party1TransactionSignature = new TransactionSignature(party1Signature, Transaction.SigHash.ALL, false);
 
-        Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(ImmutableList.of(party1TransactionSignature), redeemMultisigScript);
-        input.setScriptSig(inputScript);
+        Script inputScriptSigned = ScriptBuilder.createP2SHMultiSigInputScript(ImmutableList.of(party1TransactionSignature), redeemMultisigScript);
+        inputTrans.setScriptSig(inputScriptSigned);
+
+
+
+
+        /*
+
 
         //Log.v("Transaction", "Wallet signed Input: " + Hex.toHexString(spendTx.bitcoinSerialize()));
+*/
 
         //define the receiver address
         Address receiverAddress = null;
@@ -125,7 +157,7 @@ public class MultsigTest extends InstrumentationTestCase {
                 resultado);
     }
 
-
+    //try use this - http://bitcoin.stackexchange.com/questions/7708/how-do-i-create-an-offline-transaction-in-java-to-broadcast-via-blockchain-info
 
 
 }
